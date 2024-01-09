@@ -374,12 +374,16 @@ class JinjaFormatter:
 
     mode: Mode
     code_formatter: BlackWrapper = field(default_factory=lambda: BlackWrapper())
+    preserve_case: bool = False
 
     def __post_init__(self) -> None:
         self.use_black = (
             self.code_formatter.black is not None and not self.mode.no_jinjafmt
         )
-        self.node_manager = NodeManager(self.mode.dialect.case_sensitive_names)
+        self.node_manager = NodeManager(
+            self.mode.dialect.case_sensitive_names,
+            preserve_case=self.preserve_case,
+        )
 
     def format_line(self, line: Line) -> List[Line]:
         """
