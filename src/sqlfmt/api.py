@@ -34,7 +34,12 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 
-def format_string(source_string: str, mode: Mode) -> str:
+def format_string(
+    source_string: str,
+    mode: Mode,
+    *,
+    preserve_case: bool = False,
+) -> str:
     """
     Takes a raw query string and a mode as input, returns the formatted query
     as a string, or raises a SqlfmtError if the string cannot be formatted.
@@ -42,9 +47,14 @@ def format_string(source_string: str, mode: Mode) -> str:
     If mode.fast is False, also performs a safety check to ensure no tokens
     are dropped from the original input.
     """
-    analyzer = mode.dialect.initialize_analyzer(line_length=mode.line_length)
-    raw_query = analyzer.parse_query(source_string=source_string)
-    formatter = QueryFormatter(mode)
+    analyzer = mode.dialect.initialize_analyzer(
+        line_length=mode.line_length,
+        preserve_case=preserve_case,
+    )
+    raw_query = analyzer.parse_query(
+        source_string=source_string,
+    )
+    formatter = QueryFormatter(mode, preserve_case=preserve_case)
     formatted_query = formatter.format(raw_query)
     result = str(formatted_query)
 

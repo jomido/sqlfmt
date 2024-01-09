@@ -25,14 +25,22 @@ class Dialect(ABC):
         """
         return sorted(self.RULES, key=lambda rule: rule.priority)
 
-    def initialize_analyzer(self, line_length: int) -> Analyzer:
+    def initialize_analyzer(
+        self,
+        line_length: int,
+        *,
+        preserve_case: bool = False,
+    ) -> Analyzer:
         """
         Creates and returns an analyzer that uses the Dialect's rules for lexing
         """
         analyzer = Analyzer(
             line_length=line_length,
             rules=self.get_rules(),
-            node_manager=NodeManager(self.case_sensitive_names),
+            node_manager=NodeManager(
+                self.case_sensitive_names,
+                preserve_case=preserve_case,
+            ),
         )
         return analyzer
 

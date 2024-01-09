@@ -8,8 +8,14 @@ from sqlfmt.token import Token, TokenType
 
 
 class NodeManager:
-    def __init__(self, case_sensitive_names: bool) -> None:
+    def __init__(
+        self,
+        case_sensitive_names: bool,
+        *,
+        preserve_case: bool = False,
+    ) -> None:
         self.case_sensitive_names = case_sensitive_names
+        self.preserve_case = preserve_case
 
     def create_node(self, token: Token, previous_node: Optional[Node]) -> Node:
         """
@@ -238,6 +244,9 @@ class NodeManager:
         or comments should be lowercased and have any internal
         whitespace replaced with a single space
         """
+        if self.preserve_case:
+            return token.token
+
         if token.type.is_always_lowercased:
             return " ".join(token.token.lower().split())
         elif token.type is TokenType.NAME and not self.case_sensitive_names:

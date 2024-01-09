@@ -14,13 +14,17 @@ from sqlfmt.splitter import LineSplitter
 @dataclass
 class QueryFormatter:
     mode: Mode
+    preserve_case: bool = False
 
     def _split_lines(self, lines: List[Line]) -> List[Line]:
         """
         Splits lines to make line depth consistent and syntax
         apparent
         """
-        node_manager = NodeManager(self.mode.dialect.case_sensitive_names)
+        node_manager = NodeManager(
+            self.mode.dialect.case_sensitive_names,
+            preserve_case=self.preserve_case,
+        )
         splitter = LineSplitter(node_manager)
         new_lines = []
         for line in lines:
@@ -33,7 +37,10 @@ class QueryFormatter:
         Formats the contents of jinja tags (the code between
         the curlies) by mutating existing jinja nodes
         """
-        formatter = JinjaFormatter(mode=self.mode)
+        formatter = JinjaFormatter(
+            mode=self.mode,
+            preserve_case=self.preserve_case,
+        )
         new_lines: List[Line] = []
         for line in lines:
             new_lines.extend(formatter.format_line(line))
